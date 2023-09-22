@@ -25,3 +25,7 @@ export * from './ui/form';
 export * from './ui/scroll-area';
 export * from './ui/textarea';
 export * from './ui/hover-card';
+export * from './ui/toggle';
+export * from './ui/collapsible';
+export * from './ui/badge';
+export * from './ui/accordion';
