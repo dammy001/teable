@@ -311,7 +311,11 @@ export class RecordService implements IAdapterService {
     const createAttachmentsTable = this.getCreateAttachments(fieldInstanceMap, contexts);
 
     if (createAttachmentsTable.length) {
-      await this.attachmentService.updateByRecord(tableId, recordId, createAttachmentsTable);
+      await this.attachmentService.updateByRecords(
+        createAttachmentsTable.map((item) => ({ ...item, tableId, recordId }))
+      );
+    } else {
+      await this.attachmentService.deleteRecords(tableId, [recordId]);
     }
 
     const recordFieldsByDbFieldName = contexts.reduce<{ [dbFieldName: string]: unknown }>(
@@ -549,23 +553,8 @@ export class RecordService implements IAdapterService {
 
   private async batchDel(tableId: string, recordIds: string[]) {
     const dbTableName = await this.getDbTableName(tableId);
-    const fields = await this.prismaService.txClient().field.findMany({
-      where: { tableId },
-      select: { id: true, type: true },
-    });
-    const attachmentFields = fields.filter((field) => field.type === FieldType.Attachment);
 
-    await this.attachmentService.delete(
-      attachmentFields.reduce<{ tableId: string; recordId: string; fieldId: string }[]>(
-        (pre, { id }) => {
-          recordIds.forEach((recordId) => {
-            pre.push({ tableId, recordId, fieldId: id });
-          });
-          return pre;
-        },
-        []
-      )
-    );
+    await this.attachmentService.deleteRecords(tableId, recordIds);
 
     const nativeSql = this.knex(dbTableName).whereIn('__id', recordIds).del().toSQL().toNative();
 

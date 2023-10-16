@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@teable-group/db-main-prisma';
 import type { Prisma } from '@teable-group/db-main-prisma';
-import { difference } from 'lodash';
+import { difference, keyBy, map } from 'lodash';
 import { ClsService } from 'nestjs-cls';
 import type { IClsStore } from '../../types/cls';
 
@@ -12,32 +12,23 @@ export class AttachmentsTableService {
     private readonly prismaService: PrismaService
   ) {}
 
-  private createUniqueKey(
-    tableId: string,
-    fieldId: string,
-    recordId: string,
-    attachmentId: string
-  ) {
-    return `${tableId}-${fieldId}-${recordId}-${attachmentId}`;
-  }
-
-  async updateByRecord(
-    tableId: string,
-    recordId: string,
-    _attachments: {
+  async updateByRecords(
+    attachments: {
+      tableId: string;
+      recordId: string;
+      fieldId: string;
       attachmentId: string;
       token: string;
       name: string;
-      fieldId: string;
     }[]
   ) {
     const userId = this.cls.get('user.id');
 
-    const exists = await this.prismaService.txClient().attachmentsTable.findMany({
+    const existAttachments = await this.prismaService.txClient().attachmentsTable.findMany({
       where: {
-        tableId,
-        recordId,
-        deletedTime: null,
+        attachmentId: {
+          in: map(attachments, 'attachmentId'),
+        },
       },
       select: {
         attachmentId: true,
@@ -46,43 +37,19 @@ export class AttachmentsTableService {
         fieldId: true,
       },
     });
-    const attachmentsMap = _attachments.reduce((map, attachment) => {
-      const key = this.createUniqueKey(
-        tableId,
-        recordId,
-        attachment.fieldId,
-        attachment.attachmentId
-      );
-      map[key] = {
+
+    const existAttachmentsMap = keyBy(existAttachments, 'attachmentId');
+
+    const attachmentsMap = attachments.reduce((map, attachment) => {
+      const { attachmentId } = attachment;
+      map[attachmentId] = {
         ...attachment,
-        tableId,
-        recordId,
-        attachmentId: attachment.attachmentId,
         createdBy: userId,
-        lastModifiedBy: userId,
       };
       return map;
-    }, {} as { [key: string]: Prisma.AttachmentsTableCreateInput });
+    }, {} as Record<string, Prisma.AttachmentsTableCreateInput>);
 
-    const existsMap = exists.reduce(
-      (map, attachment) => {
-        const { tableId, recordId, fieldId, attachmentId } = attachment;
-        const key = this.createUniqueKey(tableId, recordId, fieldId, attachmentId);
-        map[key] = { tableId, recordId, fieldId, attachmentId };
-        return map;
-      },
-      {} as {
-        [key: string]: {
-          tableId: string;
-          recordId: string;
-          fieldId: string;
-          attachmentId: string;
-        };
-      }
-    );
-
-    const existsKeys = Object.keys(existsMap);
-
+    const existsKeys = Object.keys(existAttachmentsMap);
     const attachmentsKeys = Object.keys(attachmentsMap);
 
     const needDeleteKey = difference(existsKeys, attachmentsKeys);
@@ -94,28 +61,23 @@ export class AttachmentsTableService {
       });
     }
 
-    const toDeletes = needDeleteKey.map((key) => existsMap[key]);
-    toDeletes.length && (await this.delete(toDeletes));
+    await this.delete(needDeleteKey);
   }
 
-  async delete(
-    query: {
-      tableId: string;
-      recordId: string;
-      fieldId: string;
-      attachmentId?: string;
-    }[]
-  ) {
-    if (!query.length) {
+  async delete(attachmentIds: string[]) {
+    if (!attachmentIds.length) {
       return;
     }
 
     await this.prismaService.txClient().attachmentsTable.deleteMany({
-      where: { OR: query },
+      where: { attachmentId: { in: attachmentIds } },
     });
   }
 
   async deleteFields(tableId: string, fieldIds: string[]) {
+    if (fieldIds.length === 0) {
+      return;
+    }
     await this.prismaService.txClient().attachmentsTable.deleteMany({
       where: { tableId, fieldId: { in: fieldIds } },
     });
@@ -124,6 +86,15 @@ export class AttachmentsTableService {
   async deleteTable(tableId: string) {
     await this.prismaService.txClient().attachmentsTable.deleteMany({
       where: { tableId },
+    });
+  }
+
+  async deleteRecords(tableId: string, recordIds: string[]) {
+    if (recordIds.length === 0) {
+      return;
+    }
+    await this.prismaService.txClient().attachmentsTable.deleteMany({
+      where: { tableId, recordId: { in: recordIds } },
     });
   }
 }
