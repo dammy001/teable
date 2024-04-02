@@ -783,8 +783,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(vitest@1.4.0)
       autoprefixer:
-        specifier: 10.4.18
-        version: 10.4.18(postcss@8.4.36)
+        specifier: 10.4.19
+        version: 10.4.19(postcss@8.4.36)
       cross-env:
         specifier: 7.0.3
         version: 7.0.3
@@ -1621,8 +1621,8 @@ importers:
         specifier: 18.2.21
         version: 18.2.21
       autoprefixer:
-        specifier: 10.4.18
-        version: 10.4.18(postcss@8.4.36)
+        specifier: 10.4.19
+        version: 10.4.19(postcss@8.4.36)
       core-js:
         specifier: 3.36.0
         version: 3.36.0
@@ -11241,8 +11241,8 @@ packages:
     engines: {node: '>=8.0.0'}
     dev: false
 
-  /autoprefixer@10.4.18(postcss@8.4.36):
-    resolution: {integrity: sha512-1DKbDfsr6KUElM6wg+0zRNkB/Q7WcKYAaK+pzXn+Xqmszm/5Xa9coeNdtP88Vi+dPzZnMjhge8GIV49ZQkDa+g==}
+  /autoprefixer@10.4.19(postcss@8.4.36):
+    resolution: {integrity: sha512-BaENR2+zBZ8xXhM4pUaKUxlVdxZ0EZhjvbopwnXmxRUfqDmwSpC2lAi/QXvx7NRdPCo1WKEcEF6mV64si1z4Ew==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -15118,6 +15118,7 @@ packages:
 
   /filelist@1.0.4:
     resolution: {integrity: sha512-w1cEuf3S+DrLCQL7ET6kz+gmlJdbq9J7yXCSjK/OZCPA+qEN1WyF4ZAf0YYJa4/shHJra2t/d/r8SV4Ji+x+8Q==}
+    requiresBuild: true
     dependencies:
       minimatch: 5.1.6
 
@@ -17168,6 +17169,7 @@ packages:
     resolution: {integrity: sha512-ZDi3aP+fG/LchyBzUM804VjddnwfSfsdeYkwt8NcbKRvo4rFkjhs456iLFn3k2ZUWvNe4i48WACDbza8fhq2+w==}
     engines: {node: '>=10'}
     hasBin: true
+    requiresBuild: true
     dependencies:
       async: 3.2.5
       chalk: 4.1.2
@@ -18493,7 +18495,7 @@ packages:
       '@rollup/plugin-node-resolve': 11.2.1(rollup@2.79.1)
       '@surma/rollup-plugin-off-main-thread': 2.2.3
       asyncro: 3.0.0
-      autoprefixer: 10.4.18(postcss@8.4.36)
+      autoprefixer: 10.4.19(postcss@8.4.36)
       babel-plugin-macros: 3.1.0
       babel-plugin-transform-async-to-promises: 0.8.18
       babel-plugin-transform-replace-expressions: 0.2.0(@babel/core@7.24.0)
@@ -21664,7 +21666,7 @@ packages:
       '@csstools/postcss-text-decoration-shorthand': 3.0.4(postcss@8.4.36)
       '@csstools/postcss-trigonometric-functions': 3.0.6(postcss@8.4.36)
       '@csstools/postcss-unset-value': 3.0.1(postcss@8.4.36)
-      autoprefixer: 10.4.18(postcss@8.4.36)
+      autoprefixer: 10.4.19(postcss@8.4.36)
       browserslist: 4.23.0
       css-blank-pseudo: 6.0.1(postcss@8.4.36)
       css-has-pseudo: 6.0.2(postcss@8.4.36)
@@ -25685,6 +25687,7 @@ packages:
 
   /unique-slug@2.0.2:
     resolution: {integrity: sha512-zoWr9ObaxALD3DOPfjPSqxt4fnZiWblxHIgeWqW8x7UqDzEtHEQLzji2cuJYQFCU6KmoJikOYAZlrTHHebjx2w==}
+    requiresBuild: true
     dependencies:
       imurmurhash: 0.1.4
 
